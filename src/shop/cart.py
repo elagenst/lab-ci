@@ -54,7 +54,3 @@ class Cart:
         if not self._items:
             return None
         return max(self._items.values(), key=lambda item: item.price)
-
-    def apply_double_discount(self, price: float) -> float:
-        # Логічна помилка: знижка застосовується двічі випадково
-        return (price * 0.9) * 0.9
