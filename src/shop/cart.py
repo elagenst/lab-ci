@@ -5,9 +5,6 @@ from typing import Protocol
 class RateProvider(Protocol):
     """Джерело курсів валют: скільки гривень коштує 1 одиниця валюти."""
 
-
-
-
     def get_rate(self, currency: str) -> float: ...
 
 
@@ -31,9 +28,6 @@ class Cart:
             self._items[name].qty += qty
         else:
             self._items[name] = Item(name, price, qty)
-
-
-
 
     def remove(self, name: str) -> None:
         if name not in self._items:
