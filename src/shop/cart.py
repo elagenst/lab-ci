@@ -54,7 +54,3 @@ class Cart:
         if not self._items:
             return None
         return max(self._items.values(), key=lambda item: item.price)
-
-    def get_status(self) -> str:
-        # Навмисна помилка: вказали, що повертаємо рядок (str), а повертаємо число (int)
-        return 200
