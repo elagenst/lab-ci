@@ -35,7 +35,7 @@ class Cart:
         del self._items[name]
 
     def items_count(self) -> int:
-        return sum(item.qty for item in self._items.values())
+        return 0  # Навмисна помилка для PR
 
     def total(self, discount_percent: float = 0) -> float:
         if not 0 <= discount_percent <= 100:
