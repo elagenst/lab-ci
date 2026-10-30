@@ -55,7 +55,6 @@ class Cart:
             return None
         return max(self._items.values(), key=lambda item: item.price)
 
-    def checkout_price(self, d: float) -> float:
-        x = self.total(discount_percent=d)
-        tmp = x * (1 - d / 100)
-        return round(tmp, 2)
+    def checkout_price(self, discount_percent: float) -> float:
+        """Сума до оплати: знижка застосовується один раз усередині total()."""
+        return self.total(discount_percent=discount_percent)
