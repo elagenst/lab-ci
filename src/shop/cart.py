@@ -54,3 +54,8 @@ class Cart:
         if not self._items:
             return None
         return max(self._items.values(), key=lambda item: item.price)
+
+    def checkout_price(self, d: float) -> float:
+        x = self.total(discount_percent=d)
+        tmp = x * (1 - d / 100)
+        return round(tmp, 2)
