@@ -7,7 +7,9 @@ on:
 permissions:
   contents: read
   pull-requests: write
-  models: read
+
+env:
+  MODEL: gemini-3.8-flash
 
 jobs:
   ai-review:
@@ -32,18 +34,30 @@ jobs:
           } > prompt.txt
 
       - name: Ask the model
-        id: ai
         if: steps.diff.outputs.has_changes == 'true'
-        uses: actions/ai-inference@v1
-        with:
-          system-prompt-file: ./.github/ai-review/system-prompt.md
-          prompt-file: ./prompt.txt
-          max-tokens: 1500
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          jq -n --arg model "$MODEL" \
+            --rawfile system .github/ai-review/system-prompt.md \
+            --rawfile user prompt.txt \
+            '{model: $model, messages: [{role: "system", content: $system}, {role: "user", content: $user}]}' \
+            > request.json
+          curl -sS https://generativelanguage.googleapis.com/v1beta/openai/chat/completions \
+            -H "Authorization: Bearer $GEMINI_API_KEY" \
+            -H "Content-Type: application/json" \
+            -d @request.json > response.json
+          if ! jq -e '.choices[0].message.content' response.json > /dev/null 2>&1; then
+            echo "Модель повернула помилку:"
+            cat response.json
+            exit 1
+          fi
+          jq -r '.choices[0].message.content' response.json > review.md
 
       - name: Post review comment
         if: steps.diff.outputs.has_changes == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          { echo "### 🤖 AI-рев'ю"; echo; cat "${{ steps.ai.outputs.response-file }}"; } > comment.md
+          { echo "### 🤖 AI-рев'ю (${MODEL})"; echo; cat review.md; } > comment.md
           gh pr comment ${{ github.event.pull_request.number }} --repo ${{ github.repository }} --body-file comment.md

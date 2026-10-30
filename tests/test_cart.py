@@ -83,3 +83,7 @@ def test_most_expensive_sample_cart(sample_cart: Cart) -> None:
     assert item is not None
     assert item.name == "Ноутбук"
     assert item.price == 25000.0
+
+
+def test_checkout_price_applies_discount_once(sample_cart: Cart) -> None:
+    assert sample_cart.checkout_price(10.0) == 25290.0
